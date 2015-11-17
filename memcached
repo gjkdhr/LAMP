@@ -8,6 +8,7 @@
 # processname: memcached
 # config: /etc/sysconfig/memcached
 
+
 . /etc/rc.d/init.d/functions
 
 ## Default variables
