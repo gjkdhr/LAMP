@@ -25,3 +25,4 @@ NTPDATE_OPTION=""
         ntpq -p
         sleep 10
 }
+
