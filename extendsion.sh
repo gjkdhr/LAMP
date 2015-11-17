@@ -1,3 +1,4 @@
+#!/bin/bash
 
 #PHP Extend install Imagemagick and Imagick for Deal with Picture
 #PHP Extend install opcache is a PHP huancun.
