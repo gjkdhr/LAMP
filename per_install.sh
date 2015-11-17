@@ -54,7 +54,6 @@ function setting_yum_source(){
 
 
 
-
 #prefre instatnation setting
 function install_setting(){
         #display the ip address
