@@ -16,7 +16,6 @@ function create_user(){
 	/usr/sbin/useradd -r -g nginx nginx
 }
 
-
 #close the debug on the install.make the install_package litter.
 function close_debug(){
 	sed -i '/debug/{n;s/.*/#&/g}' $SOURCE_DIR/untar/${NginxVersion}/auto/cc/gcc
