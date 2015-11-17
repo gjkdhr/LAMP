@@ -16,7 +16,6 @@ PcreVersion="pcre-8.37"
 LibeditVersion="libedit-20150325-3.1"
 ImapVersion="imap-2007f"
 PhpMyAdminVersion="phpMyAdmin-4.4.12-languages"
-
 DB_Version=2
 PHP_Version=3
 
