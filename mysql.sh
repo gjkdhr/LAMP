@@ -158,6 +158,5 @@ EOF
         fi
 
 }
-	
 install_database
 install_mysql
