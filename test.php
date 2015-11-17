@@ -11,3 +11,4 @@ echo "Store data in the cache (data will expire in 600 seconds)<br/>\n";
 $get_result = $mem->get('testkey');
 echo "$get_result is from memcached server.";         
 ?>
+
