@@ -53,6 +53,19 @@ function setting_yum_source(){
 }
 
 
+#Get IP address
+function getIP(){
+        IP=`ifconfig eth0|grep "inet addr"|cut -d ':' -f 2|gawk '{print $1}'`
+        if [ "$IP" = ""]
+        then
+                echo "Please config your network." 
+                exit 1
+        fi
+        echo "$IP"
+	echo -e "`hostname`\t$IP" >> /etc/hosts
+}
+
+
 
 #prefre instatnation setting
 function install_setting(){
@@ -61,6 +74,7 @@ function install_setting(){
         getIP
         echo -e "Your host public IP is\t\033[32m$IP\033[0m"
         echo ""
+	echo -e
 
         #setting the yum source
         setting_yum_source
