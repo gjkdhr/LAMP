@@ -16,6 +16,7 @@ function create_user(){
 	/usr/sbin/useradd -r -g nginx nginx
 }
 
+
 #close the debug on the install.make the install_package litter.
 function close_debug(){
 	sed -i '/debug/{n;s/.*/#&/g}' $SOURCE_DIR/untar/${NginxVersion}/auto/cc/gcc
@@ -120,8 +121,9 @@ function install_nginx(){
 export PATH=/usr/local/nginx/sbin:$PATH
 VIM
 	source /etc/profile.d/nginx.sh
+	export PATH=/usr/local/nginx/sbin
 
-	/usr/local/nginx/bin/nginx -t
+	/usr/local/nginx/sbin/nginx -t
 	echo -e "\nThe Nginx Server test pages.\n" > /www/htdocs/default/index.html
 	curl http://localhost/index.html
 		
