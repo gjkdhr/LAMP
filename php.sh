@@ -16,6 +16,7 @@ PcreVersion="pcre-8.37"
 LibeditVersion="libedit-20150325-3.1"
 ImapVersion="imap-2007f"
 PhpMyAdminVersion="phpMyAdmin-4.4.12-languages"
+
 DB_Version=2
 PHP_Version=3
 
@@ -129,43 +130,37 @@ function install_libedit(){
 }
 
 
-
-#install php5
+# Install PHP5
 function install_php(){
-        if [ ! -f /usr/local/php/bin/php ]
-        then
-                #database compile dependency
+        if [ ! -d /usr/local/php ]
+	then
+                # database compile dependency
                 if [ $DB_Version -eq 1 -o $DB_Version -eq 2 ]
-                then
-                        WITH_MYSQL="--with-mysql=/usr/local/mysql"
+		then
+                	WITH_MYSQL="--with-mysql=/usr/local/mysql"
                         WITH_MYSQLI="--with-mysqli=/usr/local/mysql/bin/mysql_config"
+                elif [ $DB_version -eq 3 -o $DB_version -eq 4 ]
+		then
+                        WITH_MYSQL="--with-mysql=/usr/local/mariadb"
+                        WITH_MYSQLI="--with-mysqli=/usr/local/mariadb/bin/mysql_config"
                 fi
 
-                #ldap module dependency
+                echo "Start Installing PHP"
+                # ldap module dependency 
                 if is_64bit
-                then
+		then
                         cp -rpf /usr/lib64/libldap* /usr/lib/
                         cp -rpf /usr/lib64/liblber* /usr/lib/
                 fi
-   
-		/usr/sbin/groupadd  php-fpm
-		/usr/sbin/useradd -r -g php-fpm php-fpm
 
-		mkdir -pv /usr/local/php
-		mkdir -pv /usr/local/php/etc
-                mkdir -pv /usr/local/php/php.d
-		
-                sleep 5
-
-
-		if [ $PHP_Version -eq 1 ]
+                if [ $PHP_Version -eq 1 ]
                 then
                         cd $SOURCE_DIR/untar/$PhpVersion1
                 elif [ $PHP_Version -eq 2 ]
                 then
-                        cd $SOURCE_DIR/untar/$PhpVersion2
-                        #add php5.3 patch
-                        patch -p1 < $SOURCE_DIR/php5.3.patch
+                       cd $SOURCE_DIR/untar/$PhpVersion2
+                       # Add PHP5.3 patch
+                       patch -p1 < $SOURCE_DIR/php5.3.patch
                 elif [ $PHP_Version -eq 3 ]
                 then
                         cd $SOURCE_DIR/untar/$PhpVersion3
@@ -174,62 +169,67 @@ function install_php(){
                         cd $SOURCE_DIR/untar/$PhpVersion4
                 fi
 
+		mkdir -pv /usr/local/php/etc
+		mkdir -pv /usr/local/php/php.d
 
-                #complied the php
-                ./configure \
-		--prefix=/usr/local/php/ \
-                --with-config-file-path=/usr/local/php/etc/ \
-		--with-config-file-scan-dir=/usr/local/php/php.d/ \
+		./configure \
+                --prefix=/usr/local/php \
+                --with-config-file-path=/usr/local/php/etc \
                 $WITH_MYSQL \
                 $WITH_MYSQLI \
-                --with-mysql-sock=/data/mysql/mysql.sock \
                 --with-pcre-dir=/usr/local/pcre \
-		--with-gd \
-                --with-png-dir=/usr \
-                --with-jpeg-dir \
-                --with-freetype-dir \
-                --with-xpm-dir \
-                --with-zlib-dir \
-                --with-t1lib \
                 --with-iconv-dir=/usr/local/libiconv \
-                --enable-libxml \
-                --enable-xml \
+                --with-mysql-sock=/data/mysql/mysql.sock \
+                --with-config-file-scan-dir=/usr/local/php/php.d \
+                --with-mhash=/usr \
+                --with-icu-dir=/usr \
+                --with-bz2 \
+                --with-curl \
+                --with-freetype-dir \
+                --with-gd \
+                --with-gettext \
+                --with-gmp \
+                --with-jpeg-dir \
+                --with-ldap \
+                --with-ldap-sasl \
+                --with-mcrypt \
+                --with-openssl \
+                --without-pear \
+                --with-pdo-mysql \
+                --with-png-dir \
+                --with-readline \
+                --with-xmlrpc \
+                --with-xsl \
+                --with-zlib \
                 --enable-bcmath \
-                --enable-shmop \        
-                --enable-inline-optimization \
-                --enable-opcache \
-                --enable-mbregex \
-                --enable-fpm \
-		--enable-mbstring \
+		--enable-calendar \
+                --enable-ctype \
+                --enable-dom \
+                --enable-exif \
                 --enable-ftp \
                 --enable-gd-native-ttf \
-                --with-openssl \
+                --enable-intl \
+                --enable-json \
+                --enable-mbstring \
                 --enable-pcntl \
-                --enable-sockets \
-                --with-xmlrpc \
-                --enable-zip \
-                --enable-soap \
-                --without-pear \
-                --with-gettext \
-                --with-curl \
-                --enable-ctype \
                 --enable-session \
-                --with-mhash=/usr \
-                --with-libedit=/usr \ 
-                --with-mcrypt=/usr
+                --enable-shmop \
+                --enable-simplexml \
+                --enable-soap \
+                --enable-sockets \
+                --enable-tokenizer \
+                --enable-wddx \
+                --enable-xml \
 
-
+		if [ $? -ne 0 ]
+		then
+                	echo "PHP configure failed, Please visit https://lamp.sh/support.html and contact."
+                        exit 1
+                fi
+	
                 make
                 make install
-
-                if [ $? -ne 0 ]
-                then
-                        echo "Compiled the PHP fialed,Please check the option."
-                        exit 1
-                else
-                        echo "Compiled the PHP scusseced."
-                fi
-
+		
 		if [ $PHP_Version -eq 1 ]
                 then
                         mkdir -pv /usr/local/php/lib/php/extensions/no-debug-non-zts-20100525
@@ -244,49 +244,48 @@ function install_php(){
                         mkdir -pv /usr/local/php/lib/php/extensions/no-debug-non-zts-20131226
                 fi
 
-
 		#copy the PHP config file
                 rm -rf /etc/php.ini
                 cp -f php.ini-production  /usr/local/php/etc/php.ini
                 ln -sv  /usr/local/php/etc/php.ini /etc/php.ini
                 sed -i 's/;data.timezone/data.timezone = Asia\/Shanghai/g' /etc/php.ini
 
-                #copy the php-fpm file and configuration
-		cp saip/fpm/init.d.php-fpm /etc/init.d/php-fpm
-		chmod +x /etc/init.d/php-fpm
-		chkconfig --add php-fpm
-		chkconfig php-fpm on
-		chkconfig --list php-fpm
-				
-		
-		#config the php-fpm config file
-		cp /usr/local/php/etc/php-fpm.conf.default /usr/local/php/etc/php-fpm.conf
-		
-			
-                #add the env make php exec file run     
+
+		#copy the php-fpm file and configuration
+                cp saip/fpm/init.d.php-fpm /etc/init.d/php-fpm
+                chmod +x /etc/init.d/php-fpm
+                chkconfig --add php-fpm
+                chkconfig php-fpm on
+                chkconfig --list php-fpm
+
+		 #config the php-fpm config file
+                cp /usr/local/php/etc/php-fpm.conf.default /usr/local/php/etc/php-fpm.conf
+
+		#add the env make php exec file run     
                 cat >> /etc/profile.d/php.sh << EOF
 export  PATH=/usr/local/php/bin:$PATH
 EOF
-                source /etc/profile.d/php.sh	
+                source /etc/profile.d/php.sh
+		export PATH=/usr/local/php/bin:$PATH
 
 		#check the php-fpm
-		/etc/init.d/php-fpm start 
+                /etc/init.d/php-fpm start
                 netstat -antple|grep php-fpm
-		
-		if [ $? -eq 0 ]
-		then
-			echo "============================================="
-                	echo "The php-fpm have startup Successfully."
-		else
-			echo "============================================"
-			echo "The php-fpm have startup Failed."
-		fi
+
+                if [ $? -eq 0 ]
+                then
+                        echo "============================================="
+                        echo "The php-fpm have startup Successfully."
+                else
+                        echo "============================================"
+                        echo "The php-fpm have startup Failed."
+                fi
 
         else
-                echo "PHP had been installed"
+                echo "perfect."
         fi
-
 }
+
 
 
 function INSTALL_PHP(){
@@ -297,8 +296,7 @@ function INSTALL_PHP(){
         install_re2c
         install_libedit
 #	install_imap
-#        install_php
-		
+        install_php
 }
 
 INSTALL_PHP
