@@ -66,6 +66,12 @@ function getIP(){
 }
 
 
+#add the localhost resolv
+localhost_resolv(){
+        IP=`ifconfig eth0|grep "inet addr"|cut -d ':' -f 2|gawk '{print $1}'`
+        echo -e "$IP\t`hostname`" >> /etc/hosts
+}
+
 
 #prefre instatnation setting
 function install_setting(){
