@@ -123,6 +123,8 @@ VIM
 	source /etc/profile.d/nginx.sh
 	export PATH=/usr/local/nginx/sbin
 
+	cp -rf ./nginx.conf /usr/local/nginx/conf/
+	/usr/local/nginx/sbin/nginx
 	/usr/local/nginx/sbin/nginx -t
 	echo -e "\nThe Nginx Server test pages.\n" > /www/htdocs/default/index.html
 	curl http://localhost/index.html
