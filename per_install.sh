@@ -275,3 +275,4 @@ function per_install_setting(){
 }
 
 per_install_setting
+
