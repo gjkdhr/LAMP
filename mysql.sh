@@ -143,7 +143,7 @@ EOF
 		#config mysql command 
 		cat >> /etc/profile.d/mysql.sh << EOF
 export PATH=/usr/local/mysql/bin/:$PATH
-VIM
+EOF
 
 		#configure mysql lib file 
                 cat > /etc/ld.so.conf.d/mysql.conf << EOF
