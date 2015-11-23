@@ -124,7 +124,8 @@ VIM
 	export PATH=/usr/local/nginx/sbin
 
 	nginx 
-	cp -rf ./nginx.conf /usr/local/nginx/conf/
+	cp -rf /root/lamp/nginx.conf /usr/local/nginx/conf/
+	/usr/local/nginx/sbin/nginx
 	/usr/local/nginx/sbin/nginx -t
 	echo -e "\nThe Nginx Server test pages.\n" > /www/htdocs/default/index.html
 	curl http://localhost/index.html
