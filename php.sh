@@ -171,7 +171,10 @@ function install_php(){
 
 		mkdir -pv /usr/local/php/etc
 		mkdir -pv /usr/local/php/php.d
-
+		/usr/sbin/groupadd  php-fpm
+		/usr/sbin/useradd -r -g php-fpm php-fpm
+	
+	
 		./configure \
                 --prefix=/usr/local/php \
                 --with-config-file-path=/usr/local/php/etc \
@@ -181,6 +184,9 @@ function install_php(){
                 --with-iconv-dir=/usr/local/libiconv \
                 --with-mysql-sock=/data/mysql/mysql.sock \
                 --with-config-file-scan-dir=/usr/local/php/php.d \
+		--enable-fpm \
+		--with-fpm-user=php-fpm \
+		--with-fpm-group=php-fpm \
                 --with-mhash=/usr \
                 --with-icu-dir=/usr \
                 --with-bz2 \
@@ -246,13 +252,13 @@ function install_php(){
 
 		#copy the PHP config file
                 rm -rf /etc/php.ini
-                cp -f php.ini-production  /usr/local/php/etc/php.ini
-                ln -sv  /usr/local/php/etc/php.ini /etc/php.ini
-                sed -i 's/;data.timezone/data.timezone = Asia\/Shanghai/g' /etc/php.ini
+		cp php.ini-production /usr/local/php/etc/php.ini
+                ln -sv  /usr/local/php/etc/php.ini /etc/
+                sed -i 's/;data.timezone/data.timezone = Asia\/Shanghai/g' /usr/local/php/etc/php.ini
 
 
 		#copy the php-fpm file and configuration
-                cp saip/fpm/init.d.php-fpm /etc/init.d/php-fpm
+                cp sapi/fpm/init.d.php-fpm /etc/init.d/php-fpm
                 chmod +x /etc/init.d/php-fpm
                 chkconfig --add php-fpm
                 chkconfig php-fpm on
@@ -282,7 +288,7 @@ EOF
                 fi
 
         else
-                echo "perfect."
+                echo "The PHP has installed Successfully."
         fi
 }
 
